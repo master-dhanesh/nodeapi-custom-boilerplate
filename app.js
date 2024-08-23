@@ -12,6 +12,9 @@ require("./models/db");
 
 // logger
 app.use(require("morgan")("tiny"));
+// ejs
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 // body-parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -22,6 +25,15 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/user", userRouter);
 app.use("/blog", blogRouter);
+
+// error handling
+app.use("*", (req, res) => {
+    res.status(404).json({ message: "route not found" });
+});
+
+app.use((err, req, res, next) => {
+    res.status(err.status || 500).json({ message: err.message });
+});
 
 // server
 app.listen(process.env.PORT, () => {
